@@ -52,10 +52,9 @@ app.get('/start-call/:number', async (req, res) => {
   }
 });
 
-// Endpoint to hang up a call
-app.get('/hangup', async (req, res) => {
+app.post('/hangup', async (req, res) => {
   try {
-    const response = await axios.get('https://api.telavox.se/hangup', {
+    const response = await axios.post('https://api.telavox.se/hangup', null, {
       headers: {
         Authorization: `Bearer ${req.jwtToken}`
       }
@@ -67,6 +66,28 @@ app.get('/hangup', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while hanging up the call' });
   }
 });
+
+
+app.get('/send-sms/:number', async (req, res) => {
+  try {
+    const number = req.params.number;
+    const message = 'Hello, this is a test SMS!';
+
+    const response = await axios.post(`https://api.telavox.se/sms/${number}`, {
+      message: message
+    }, {
+      headers: {
+        Authorization: `Bearer ${req.jwtToken}`
+      }
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error sending SMS:', error.message);
+    res.status(500).json({ error: 'An error occurred while sending the SMS' });
+  }
+});
+
 
 
 app.listen(PORT, () => {
